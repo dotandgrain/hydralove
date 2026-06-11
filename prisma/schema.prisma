@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String             @id @default(cuid())
+  name              String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  partners          Partner[]
+  reminders         Reminder[]
+  pushSubscriptions PushSubscription[]
+  reminderLogs      ReminderLog[]
+}
+
+model Partner {
+  id           String        @id @default(cuid())
+  userId       String
+  name         String
+  dailyGoalMl  Int           @default(2000)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reminders    Reminder[]
+  reminderLogs ReminderLog[]
+
+  @@index([userId])
+}
+
+model Reminder {
+  id           String        @id @default(cuid())
+  userId       String
+  partnerId    String
+  time         String
+  timezone     String        @default("Asia/Hong_Kong")
+  message      String
+  deliveryMethod String      @default("Web Push")
+  enabled      Boolean       @default(true)
+  repeatType   String        @default("daily")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  partner      Partner       @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  reminderLogs ReminderLog[]
+
+  @@index([userId])
+  @@index([partnerId])
+  @@index([enabled, time])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ReminderLog {
+  id         String   @id @default(cuid())
+  reminderId String
+  userId     String
+  partnerId  String
+  sentAt     DateTime?
+  status     String   @default("pending")
+  message    String
+  createdAt  DateTime @default(now())
+  reminder   Reminder @relation(fields: [reminderId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  partner    Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([reminderId, createdAt])
+  @@index([userId])
+  @@index([partnerId])
+}
