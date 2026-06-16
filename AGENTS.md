@@ -237,3 +237,119 @@ Do not overwrite user changes.
 If there are unexpected modified files, stop and ask before touching them.
 
 Do not run destructive commands unless explicitly requested.
+
+Avoid:
+
+```bash
+git reset --hard
+git clean -fd
+rm -rf
+```
+
+---
+
+## Dependency Rules
+
+Do not install new packages unless necessary.
+
+Before adding a dependency:
+
+1. Check whether the project already has a similar package.
+2. Explain why the dependency is needed.
+3. Prefer native platform features when reasonable.
+
+Avoid adding large UI libraries for small UI changes.
+
+Avoid adding state management libraries unless the app clearly needs them.
+
+---
+
+## File Reading Strategy
+
+Use this order:
+
+1. `package.json`
+2. relevant route / page file
+3. relevant component file
+4. relevant style file
+5. relevant config file
+
+Do not inspect unrelated folders.
+
+For Next.js, check likely folders:
+
+```bash
+app
+pages
+components
+src
+styles
+public
+```
+
+For Vite / React, check likely folders:
+
+```bash
+src
+components
+pages
+styles
+public
+```
+
+---
+
+## Response Style
+
+When reporting back to the user:
+
+* Start with the result.
+* Use concise bullet points.
+* Mention changed files.
+* Mention verification result.
+* Mention unresolved risks clearly.
+* Do not include long code dumps unless requested.
+
+Use this format:
+
+```md
+Done.
+
+Changed:
+- `file/path`: what changed
+
+Checked:
+- `npm run build`: passed / failed
+
+Notes:
+- Any important limitation or next step
+```
+
+If the task cannot be completed, explain exactly why and what information is missing.
+
+---
+
+## Safety
+
+Do not touch secrets or credentials.
+
+Do not print `.env` contents.
+
+Do not expose API keys.
+
+Do not modify authentication, payment, database, or deployment settings unless the user explicitly requests it.
+
+If a requested change may break production, explain the risk before making the change.
+
+---
+
+## Default Instruction
+
+When in doubt:
+
+* Search before reading.
+* Read less.
+* Edit less.
+* Verify with the smallest relevant command.
+* Keep explanations short.
+* Avoid unnecessary token usage.

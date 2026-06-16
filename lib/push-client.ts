@@ -7,6 +7,17 @@ function urlBase64ToUint8Array(base64String: string) {
   return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
 }
 
+async function getVapidPublicKey() {
+  const response = await fetch("/api/push-public-key", { cache: "no-store" });
+  const result = await response.json().catch(() => null);
+
+  if (!response.ok || !result?.publicKey) {
+    throw new Error(result?.error || "尚未設定 VAPID 公開金鑰，請先完成環境變數設定。");
+  }
+
+  return result.publicKey as string;
+}
+
 export function getOrCreateUserId() {
   const existing = localStorage.getItem("hydralove-user-id");
   if (existing) return existing;
@@ -29,8 +40,7 @@ export function pushSupportMessage() {
 export async function subscribeToPush() {
   const unsupported = pushSupportMessage();
   if (unsupported) throw new Error(unsupported);
-  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-  if (!publicKey) throw new Error("尚未設定 VAPID 公開金鑰，請先完成環境變數設定。");
+  const publicKey = await getVapidPublicKey();
   const permission = await Notification.requestPermission();
   if (permission !== "granted") throw new Error("通知權限未允許，請在系統設定中開啟通知。");
   const registration = await navigator.serviceWorker.register("/service-worker.js");

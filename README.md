@@ -16,7 +16,7 @@ npm run dev
 
 ## 排程
 
-Vercel Cron 每 15 分鐘呼叫 `/api/cron/send-reminders`。端點要求 `Authorization: Bearer <CRON_SECRET>`。本機伺服器運行時可執行：
+排程服務每 15 分鐘呼叫 `/api/cron/send-reminders`。端點要求 `Authorization: Bearer <CRON_SECRET>`。Vercel Hobby 只支援每日 Cron，因此 Hobby 部署需使用外部排程服務；Vercel Pro 可在 `vercel.json` 使用 `*/15 * * * *`。本機伺服器運行時可執行：
 
 ```bash
 npm run cron:local
